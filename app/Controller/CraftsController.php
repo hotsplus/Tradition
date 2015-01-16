@@ -84,8 +84,9 @@ class CraftsController extends AppController{
   }
   }
 
-  public function view(){
-
+  public function view($id = null){
+    $data = $this->Image->find('first',array('conditions' => array('id' => $id)));
+    $this->set('data',$data);
   }
 
 }
