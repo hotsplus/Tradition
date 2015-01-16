@@ -1,7 +1,7 @@
 <?php
 class CraftsController extends AppController{
 
-  var $uses = array('Craft','Image');
+  var $uses = array('Craft','Image','Detail');
 
   public function index(){
     $data = $this->Image->find('all');
@@ -17,10 +17,12 @@ class CraftsController extends AppController{
         $this->redirect('index');
       }
 
+/*
     if(!is_uploaded_file($this->request->data['Image']['image']['tmp_name'])){
       $this->Session->setFlash('アップロードされた画像ではありません。');
       $this->redirect('index');
     }
+*/
 
     switch($this->request->data['Image']['image']['type']){
 
@@ -54,9 +56,9 @@ class CraftsController extends AppController{
 
       // メッセージの表示
       $this->Session->setFlash(
-      '以下の画像を選択してください(jpg,gif,png,bmp)',
-      'default',
-      array('class'=>'alert alert-danger')
+        '以下の画像を選択してください(jpg,gif,png,bmp)',
+        'default',
+        array('class'=>'alert alert-danger')
       );
 
       // リダイレクト処理
@@ -72,10 +74,13 @@ class CraftsController extends AppController{
       'Image' => array(
         'filename' => $this->request->data['Image']['image']['name'],
         'image' => $fileName,
+      ),
+      'Detail' => array(
+        'content' => $this->request->data['Detail']['content'],
       )
     );
 
-    if($this->Image->save($image)){
+    if($this->Image->saveAll($image)){
       $this->Session->setFlash('画像をアップロードしました。');
       $this->redirect('index');
     } else {
@@ -85,7 +90,7 @@ class CraftsController extends AppController{
   }
 
   public function view($id = null){
-    $data = $this->Image->find('first',array('conditions' => array('id' => $id)));
+    $data = $this->Image->find('first',array('conditions' => array('image.id' => $id)));
     $this->set('data',$data);
   }
 

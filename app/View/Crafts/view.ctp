@@ -1,3 +1,3 @@
 <?php
-  echo $data['Image']['content'];
+  echo $data['Detail']['content'];
 ?>
