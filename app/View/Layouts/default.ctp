@@ -28,11 +28,11 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 	<?php
 		echo $this->Html->meta('icon');
 
-		echo $this->Html->css('cake.generic');
-
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
 		echo $this->fetch('script');
+		//echo $this->Html->css('cake.generic');
+		echo $this->Html->css('bootstrap');
 	?>
 </head>
 <body>
@@ -59,5 +59,6 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 		</div>
 	</div>
 	<?php echo $this->element('sql_dump'); ?>
+	<?php echo $this->Html->script('bootstrap'); ?>
 </body>
 </html>
