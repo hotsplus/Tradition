@@ -25,6 +25,8 @@
 
 <!--
 <?php echo $this->Html->image('Crafts/kaga.jpg'); ?>
+
+<?php echo $this->Html->image('Crafts/kaga.jpg'); ?>
 <?php foreach ($data as $key => $val): ?>
 
 <div class="well">

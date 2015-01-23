@@ -181,7 +181,7 @@ class DboSource extends DataSource {
  *
  * @var array
  */
-	protected $_sqlOps = array('like', 'ilike', 'rlike', 'or', 'not', 'in', 'between', 'regexp', 'similar to');
+	protected $_sqlOps = array('like', 'ilike', 'or', 'not', 'in', 'between', 'regexp', 'similar to');
 
 /**
  * Indicates the level of nested transactions
@@ -354,10 +354,8 @@ class DboSource extends DataSource {
 					return str_replace(',', '.', strval($data));
 				}
 				if ((is_int($data) || $data === '0') || (
-					is_numeric($data) &&
-					strpos($data, ',') === false &&
-					$data[0] != '0' &&
-					strpos($data, 'e') === false)
+					is_numeric($data) && strpos($data, ',') === false &&
+					$data[0] != '0' && strpos($data, 'e') === false)
 				) {
 					return $data;
 				}
@@ -1201,30 +1199,6 @@ class DboSource extends DataSource {
 	}
 
 /**
- * Passes association results through afterFind filters of the corresponding model.
- *
- * Similar to DboSource::_filterResults(), but this filters only specified models.
- * The primary model can not be specified, because this call DboSource::_filterResults() internally.
- *
- * @param array &$resultSet Reference of resultset to be filtered.
- * @param Model $Model Instance of model to operate against.
- * @param array $toBeFiltered List of classes to be filtered.
- * @return array Array of results that have been filtered through $Model->afterFind.
- */
-	protected function _filterResultsInclusive(&$resultSet, Model $Model, $toBeFiltered = array()) {
-		$exclude = array();
-
-		if (is_array($resultSet)) {
-			$current = reset($resultSet);
-			if (is_array($current)) {
-				$exclude = array_diff(array_keys($current), $toBeFiltered);
-			}
-		}
-
-		return $this->_filterResults($resultSet, $Model, $exclude);
-	}
-
-/**
  * Queries associations.
  *
  * Used to fetch results on recursive models.
@@ -1295,7 +1269,7 @@ class DboSource extends DataSource {
 
 			// Filter
 			if ($queryData['callbacks'] === true || $queryData['callbacks'] === 'after') {
-				$this->_filterResultsInclusive($assocResultSet, $Model, array($association));
+				$this->_filterResults($assocResultSet, $Model);
 			}
 
 			// Merge
@@ -1324,7 +1298,7 @@ class DboSource extends DataSource {
 
 			// Filter
 			if ($queryData['callbacks'] === true || $queryData['callbacks'] === 'after') {
-				$this->_filterResultsInclusive($assocResultSet, $Model, array($association, $with));
+				$this->_filterResults($assocResultSet, $Model);
 			}
 		}
 
@@ -1392,15 +1366,10 @@ class DboSource extends DataSource {
 						$this->_mergeAssociation($row, $merge, $association, $type);
 					}
 				} else {
-					if (!$prefetched && $LinkModel->useConsistentAfterFind) {
-						if ($queryData['callbacks'] === true || $queryData['callbacks'] === 'after') {
-							$this->_filterResultsInclusive($assocResultSet, $Model, array($association));
-						}
-					}
 					$this->_mergeAssociation($row, $assocResultSet, $association, $type, $selfJoin);
 				}
 
-				if ($type !== 'hasAndBelongsToMany' && isset($row[$association]) && !$prefetched && !$LinkModel->useConsistentAfterFind) {
+				if ($type !== 'hasAndBelongsToMany' && isset($row[$association]) && !$prefetched) {
 					$row[$association] = $LinkModel->afterFind($row[$association], false);
 				}
 

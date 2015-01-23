@@ -46,7 +46,6 @@ class Postgres extends DboSource {
 		'schema' => 'public',
 		'port' => 5432,
 		'encoding' => '',
-		'sslmode' => 'allow',
 		'flags' => array()
 	);
 
@@ -119,7 +118,7 @@ class Postgres extends DboSource {
 
 		try {
 			$this->_connection = new PDO(
-				"pgsql:host={$config['host']};port={$config['port']};dbname={$config['database']};sslmode={$config['sslmode']}",
+				"pgsql:host={$config['host']};port={$config['port']};dbname={$config['database']}",
 				$config['login'],
 				$config['password'],
 				$flags

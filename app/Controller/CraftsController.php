@@ -2,6 +2,7 @@
 class CraftsController extends AppController{
 
   var $uses = array('Craft','Image','Detail');
+  public $components = array('Session');
 
   public function index(){
     $data = $this->Image->find('all');

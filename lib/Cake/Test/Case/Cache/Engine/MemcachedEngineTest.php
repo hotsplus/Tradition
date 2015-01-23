@@ -103,8 +103,7 @@ class MemcachedEngineTest extends CakeTestCase {
 			'login' => null,
 			'password' => null,
 			'groups' => array(),
-			'serialize' => 'php',
-			'options' => array()
+			'serialize' => 'php'
 		);
 		$this->assertEquals($expecting, $settings);
 	}
@@ -132,23 +131,6 @@ class MemcachedEngineTest extends CakeTestCase {
 		));
 
 		$this->assertTrue($MemcachedCompressed->getMemcached()->getOption(Memcached::OPT_COMPRESSION));
-	}
-
-/**
- * test setting options
- *
- * @return void
- */
-	public function testOptionsSetting() {
-		$memcached = new TestMemcachedEngine();
-		$memcached->init(array(
-			'engine' => 'Memcached',
-			'servers' => array('127.0.0.1:11211'),
-			'options' => array(
-				Memcached::OPT_BINARY_PROTOCOL => true
-			)
-		));
-		$this->assertEquals(1, $memcached->getMemcached()->getOption(Memcached::OPT_BINARY_PROTOCOL));
 	}
 
 /**

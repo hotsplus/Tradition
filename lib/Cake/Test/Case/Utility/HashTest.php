@@ -230,16 +230,6 @@ class HashTest extends CakeTestCase {
 	}
 
 /**
- * Test get() with an invalid path
- *
- * @expectedException InvalidArgumentException
- * @return void
- */
-	public function testGetInvalidPath() {
-		Hash::get(array('one' => 'two'), true);
-	}
-
-/**
  * Test dimensions.
  *
  * @return void
@@ -2296,9 +2286,8 @@ class HashTest extends CakeTestCase {
 	}
 
 /**
- * Tests that nest() throws an InvalidArgumentException when providing an invalid input.
+ * Tests that nest() returns an empty array for invalid input instead of throwing notices.
  *
- * @expectedException InvalidArgumentException
  * @return void
  */
 	public function testNestInvalid() {
@@ -2311,7 +2300,8 @@ class HashTest extends CakeTestCase {
 				)
 			)
 		);
-		Hash::nest($input);
+		$result = Hash::nest($input);
+		$this->assertSame(array(), $result);
 	}
 
 /**

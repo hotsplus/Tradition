@@ -306,9 +306,7 @@ class TreeBehavior extends ModelBehavior {
  * @link http://book.cakephp.org/2.0/en/core-libraries/behaviors/tree.html#TreeBehavior::children
  */
 	public function children(Model $Model, $id = null, $direct = false, $fields = null, $order = null, $limit = null, $page = 1, $recursive = null) {
-		$options = array();
 		if (is_array($id)) {
-			$options = $this->_getOptions($id);
 			extract(array_merge(array('id' => null), $id));
 		}
 		$overrideRecursive = $recursive;
@@ -350,10 +348,7 @@ class TreeBehavior extends ModelBehavior {
 				$Model->escapeField($left) . ' >' => $result[0][$left]
 			);
 		}
-		$options = array_merge(compact(
-			'conditions', 'fields', 'order', 'limit', 'page', 'recursive'
-		), $options);
-		return $Model->find('all', $options);
+		return $Model->find('all', compact('conditions', 'fields', 'order', 'limit', 'page', 'recursive'));
 	}
 
 /**
@@ -431,9 +426,7 @@ class TreeBehavior extends ModelBehavior {
  * @link http://book.cakephp.org/2.0/en/core-libraries/behaviors/tree.html#TreeBehavior::getParentNode
  */
 	public function getParentNode(Model $Model, $id = null, $fields = null, $recursive = null) {
-		$options = array();
 		if (is_array($id)) {
-			$options = $this->_getOptions($id);
 			extract(array_merge(array('id' => null), $id));
 		}
 		$overrideRecursive = $recursive;
@@ -453,30 +446,16 @@ class TreeBehavior extends ModelBehavior {
 
 		if ($parentId) {
 			$parentId = $parentId[$Model->alias][$parent];
-			$options = array_merge(array(
+			$parent = $Model->find('first', array(
 				'conditions' => array($Model->escapeField() => $parentId),
 				'fields' => $fields,
 				'order' => false,
 				'recursive' => $recursive
-			), $options);
-			$parent = $Model->find('first', $options);
+			));
 
 			return $parent;
 		}
 		return false;
-	}
-
-/**
- * Convenience method to create default find() options from $arg when it is an
- * associative array.
- *
- * @param array $arg Array
- * @return array Options array
- */
-	protected function _getOptions($arg) {
-		return count(array_filter(array_keys($arg), 'is_string') > 0) ?
-			$arg :
-			array();
 	}
 
 /**
@@ -486,24 +465,12 @@ class TreeBehavior extends ModelBehavior {
  * @param int|string $id The ID of the record to read
  * @param string|array $fields Either a single string of a field name, or an array of field names
  * @param int $recursive The number of levels deep to fetch associated records
- * @return array Array of nodes from top most parent to current node
+ * @return array|null Array of nodes from top most parent to current node
  * @link http://book.cakephp.org/2.0/en/core-libraries/behaviors/tree.html#TreeBehavior::getPath
  */
 	public function getPath(Model $Model, $id = null, $fields = null, $recursive = null) {
-		$options = array();
 		if (is_array($id)) {
-			$options = $this->_getOptions($id);
 			extract(array_merge(array('id' => null), $id));
-		}
-
-		if (!empty($options)) {
-			$fields = null;
-			if (!empty($options['fields'])) {
-				$fields = $options['fields'];
-			}
-			if (!empty($options['recursive'])) {
-				$recursive = $options['recursive'];
-			}
 		}
 		$overrideRecursive = $recursive;
 		if (empty($id)) {
@@ -522,20 +489,15 @@ class TreeBehavior extends ModelBehavior {
 		if ($result) {
 			$result = array_values($result);
 		} else {
-			return array();
+			return null;
 		}
 		$item = $result[0];
-		$options = array_merge(array(
-			'conditions' => array(
-				$scope,
-				$Model->escapeField($left) . ' <=' => $item[$left],
-				$Model->escapeField($right) . ' >=' => $item[$right],
-			),
+		$results = $Model->find('all', array(
+			'conditions' => array($scope, $Model->escapeField($left) . ' <=' => $item[$left], $Model->escapeField($right) . ' >=' => $item[$right]),
 			'fields' => $fields,
 			'order' => array($Model->escapeField($left) => 'asc'),
 			'recursive' => $recursive
-		), $options);
-		$results = $Model->find('all', $options);
+		));
 		return $results;
 	}
 

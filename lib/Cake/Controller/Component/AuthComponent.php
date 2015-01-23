@@ -26,7 +26,6 @@ App::uses('Hash', 'Utility');
 App::uses('CakeSession', 'Model/Datasource');
 App::uses('BaseAuthorize', 'Controller/Component/Auth');
 App::uses('BaseAuthenticate', 'Controller/Component/Auth');
-App::uses('CakeEvent', 'Event');
 
 /**
  * Authentication control component class
@@ -56,19 +55,19 @@ class AuthComponent extends Component {
  * An array of authentication objects to use for authenticating users. You can configure
  * multiple adapters and they will be checked sequentially when users are identified.
  *
- * ```
+ * {{{
  *	$this->Auth->authenticate = array(
  *		'Form' => array(
  *			'userModel' => 'Users.User'
  *		)
  *	);
- * ```
+ * }}}
  *
  * Using the class name without 'Authenticate' as the key, you can pass in an array of settings for each
  * authentication object. Additionally you can define settings that should be set to all authentications objects
  * using the 'all' key:
  *
- * ```
+ * {{{
  *	$this->Auth->authenticate = array(
  *		'all' => array(
  *			'userModel' => 'Users.User',
@@ -77,7 +76,7 @@ class AuthComponent extends Component {
  *		'Form',
  *		'Basic'
  *	);
- * ```
+ * }}}
  *
  * You can also use AuthComponent::ALL instead of the string 'all'.
  *
@@ -97,19 +96,19 @@ class AuthComponent extends Component {
  * An array of authorization objects to use for authorizing users. You can configure
  * multiple adapters and they will be checked sequentially when authorization checks are done.
  *
- * ```
+ * {{{
  *	$this->Auth->authorize = array(
  *		'Crud' => array(
  *			'actionPath' => 'controllers/'
  *		)
  *	);
- * ```
+ * }}}
  *
  * Using the class name without 'Authorize' as the key, you can pass in an array of settings for each
  * authorization object. Additionally you can define settings that should be set to all authorization objects
  * using the 'all' key:
  *
- * ```
+ * {{{
  *	$this->Auth->authorize = array(
  *		'all' => array(
  *			'actionPath' => 'controllers/'
@@ -117,7 +116,7 @@ class AuthComponent extends Component {
  *		'Crud',
  *		'CustomAuth'
  *	);
- * ```
+ * }}}
  *
  * You can also use AuthComponent::ALL instead of the string 'all'
  *
@@ -573,18 +572,13 @@ class AuthComponent extends Component {
  * @return void
  * @see BaseAuthorize::mapActions()
  * @link http://book.cakephp.org/2.0/en/core-libraries/components/authentication.html#mapping-actions-when-using-crudauthorize
- * @deprecated 3.0.0 Map actions using `actionMap` config key on authorize objects instead
  */
 	public function mapActions($map = array()) {
 		if (empty($this->_authorizeObjects)) {
 			$this->constructAuthorize();
 		}
-		$mappedActions = array();
 		foreach ($this->_authorizeObjects as $auth) {
-			$mappedActions = Hash::merge($mappedActions, $auth->mapActions($map));
-		}
-		if (empty($map)) {
-			return $mappedActions;
+			$auth->mapActions($map);
 		}
 	}
 
@@ -609,8 +603,6 @@ class AuthComponent extends Component {
 		if ($user) {
 			$this->Session->renew();
 			$this->Session->write(self::$sessionKey, $user);
-			$event = new CakeEvent('Auth.afterIdentify', $this, array('user' => $user));
-			$this->_Collection->getController()->getEventManager()->dispatch($event);
 		}
 		return (bool)$this->user();
 	}
@@ -799,9 +791,7 @@ class AuthComponent extends Component {
 				throw new CakeException(__d('cake_dev', 'Authentication objects must implement an %s method.', 'authenticate()'));
 			}
 			$settings = array_merge($global, (array)$settings);
-			$auth = new $className($this->_Collection, $settings);
-			$this->_Collection->getController()->getEventManager()->attach($auth);
-			$this->_authenticateObjects[] = $auth;
+			$this->_authenticateObjects[] = new $className($this->_Collection, $settings);
 		}
 		return $this->_authenticateObjects;
 	}

@@ -824,14 +824,14 @@ class Multibyte {
  *
  * @param int $char decimal value of character
  * @param string $type Type 'lower' or 'upper'. Defaults to 'lower'.
- * @return array
+ * @return array|null
  */
 	protected static function _find($char, $type = 'lower') {
 		$found = array();
 		if (!isset(self::$_codeRange[$char])) {
 			$range = self::_codepoint($char);
 			if ($range === false) {
-				return array();
+				return null;
 			}
 			if (!Configure::configured('_cake_core_')) {
 				App::uses('PhpReader', 'Configure');
@@ -843,7 +843,7 @@ class Multibyte {
 		}
 
 		if (!self::$_codeRange[$char]) {
-			return array();
+			return null;
 		}
 		self::$_table = self::$_codeRange[$char];
 		$count = count(self::$_caseFold[self::$_table]);

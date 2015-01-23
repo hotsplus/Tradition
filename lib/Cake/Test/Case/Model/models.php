@@ -732,14 +732,8 @@ class ModifiedAttachment extends CakeTestModel {
  * @return void
  */
 	public function afterFind($results, $primary = false) {
-		if ($this->useConsistentAfterFind) {
-			if (isset($results[0][$this->alias]['id'])) {
-				$results[0][$this->alias]['callback'] = 'Fired';
-			}
-		} else {
-			if (isset($results['id'])) {
-				$results['callback'] = 'Fired';
-			}
+		if (isset($results['id'])) {
+			$results['callback'] = 'Fired';
 		}
 		return $results;
 	}

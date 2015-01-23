@@ -38,7 +38,6 @@ class Hash {
  * @param string|array $path The path being searched for. Either a dot
  *   separated string, or an array of path segments.
  * @param mixed $default The return value when the path does not exist
- * @throws InvalidArgumentException
  * @return mixed The value fetched from the array, or null.
  * @link http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::get
  */
@@ -49,16 +48,8 @@ class Hash {
 		if (is_string($path) || is_numeric($path)) {
 			$parts = explode('.', $path);
 		} else {
-			if (!is_array($path)) {
-				throw new InvalidArgumentException(__d('cake_dev',
-					'Invalid Parameter %s, should be dot separated path or array.',
-					$path
-				));
-			}
-
 			$parts = $path;
 		}
-
 		foreach ($parts as $key) {
 			if (is_array($data) && isset($data[$key])) {
 				$data =& $data[$key];
@@ -66,7 +57,6 @@ class Hash {
 				return $default;
 			}
 		}
-
 		return $data;
 	}
 
@@ -445,9 +435,9 @@ class Hash {
  *
  * Usage:
  *
- * ```
+ * {{{
  * $result = Hash::format($users, array('{n}.User.id', '{n}.User.name'), '%s : %s');
- * ```
+ * }}}
  *
  * The `$format` string can use any format options that `vsprintf()` and `sprintf()` do.
  *
@@ -1034,7 +1024,6 @@ class Hash {
  * @param array $options Options are:
  * @return array of results, nested
  * @see Hash::extract()
- * @throws InvalidArgumentException When providing invalid data.
  * @link http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::nest
  */
 	public static function nest(array $data, $options = array()) {
@@ -1077,14 +1066,10 @@ class Hash {
 			}
 		}
 
-		if (!$return) {
-			throw new InvalidArgumentException(__d('cake_dev',
-				'Invalid data array to nest.'
-			));
-		}
-
 		if ($options['root']) {
 			$root = $options['root'];
+		} elseif (!$return) {
+			return array();
 		} else {
 			$root = self::get($return[0], $parentKeys);
 		}
